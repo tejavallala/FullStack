@@ -4,7 +4,7 @@ import axios from "axios";
 function FirstPage() {
   const [jsonInput, setJsonInput] = useState("");
   const [responseData, setResponseData] = useState(null);
-  const [selectedOptions, setSelectedOptions] = useState([]);
+  const [selectedOption, setSelectedOption] = useState("");
   const [error, setError] = useState("");
 
   const handleSubmit = async () => {
@@ -30,12 +30,12 @@ function FirstPage() {
   };
 
   const handleOptionChange = (e) => {
-    const value = e.target.value;
-    setSelectedOptions((prev) =>
-      prev.includes(value)
-        ? prev.filter((option) => option !== value)
-        : [...prev, value]
-    );
+    setSelectedOption(e.target.value);
+  };
+
+  const formatResponse = (data) => {
+    if (!data) return "[]";
+    return `[${data.join(", ")}]`;
   };
 
   return (
@@ -74,13 +74,14 @@ function FirstPage() {
 
         {responseData && (
           <div style={{ marginTop: "20px" }}>
-            <h6 className="mb-2">Multi Filter</h6>
+            <h6 className="mb-2">Filter</h6>
             <select
-              multiple
               onChange={handleOptionChange}
               className="form-select"
-              style={{ width: "100%", height: "100px" }}
+              style={{ width: "100%" }}
+              value={selectedOption}
             >
+              <option value="">Select Filter</option>
               <option value="alphabets">Alphabets</option>
               <option value="numbers">Numbers</option>
               <option value="highest_lowercase_alphabet">
@@ -90,16 +91,16 @@ function FirstPage() {
 
             <div style={{ marginTop: "20px" }}>
               <h6>Filtered Response</h6>
-              {selectedOptions.includes("alphabets") && (
-                <p>Alphabets: {responseData.alphabets.join(",")}</p>
+              {selectedOption === "alphabets" && (
+                <p>Alphabets: {formatResponse(responseData.alphabets)}</p>
               )}
-              {selectedOptions.includes("numbers") && (
-                <p>Numbers: {responseData.numbers.join(",")}</p>
+              {selectedOption === "numbers" && (
+                <p>Numbers: {formatResponse(responseData.numbers)}</p>
               )}
-              {selectedOptions.includes("highest_lowercase_alphabet") && (
+              {selectedOption === "highest_lowercase_alphabet" && (
                 <p>
                   Highest Lowercase Alphabet:{" "}
-                  {responseData.highest_lowercase_alphabet.join(",")}
+                  {formatResponse(responseData.highest_lowercase_alphabet)}
                 </p>
               )}
             </div>
