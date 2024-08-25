@@ -11,7 +11,7 @@ function FirstPage() {
     try {
       const parsedData = JSON.parse(jsonInput);
       const response = await axios.post(
-        "https://two1bce7394.onrender.com/bhfl",
+        "https://two1bce7394.onrender.com/bfhl",
         parsedData
       );
       setResponseData(response.data);
