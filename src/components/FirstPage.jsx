@@ -33,9 +33,31 @@ function FirstPage() {
     setSelectedOption(e.target.value);
   };
 
-  const formatResponse = (data) => {
-    if (!data) return "[]";
-    return `[${data.join(", ")}]`;
+  const formatResponse = () => {
+    if (!responseData) return null;
+
+    switch (selectedOption) {
+      case "alphabets":
+        return `"alphabets": ${JSON.stringify(responseData.alphabets)}`;
+      case "numbers":
+        return `"numbers": ${JSON.stringify(responseData.numbers)}`;
+      case "highest_lowercase_alphabet":
+        return `"highest_lowercase_alphabet": ${JSON.stringify(
+          responseData.highest_lowercase_alphabet
+        )}`;
+      default:
+        return `{
+  "is_success": ${responseData.is_success},
+  "user_id": "${responseData.user_id}",
+  "email": "${responseData.email}",
+  "roll_number": "${responseData.roll_number}",
+  "numbers": ${JSON.stringify(responseData.numbers)},
+  "alphabets": ${JSON.stringify(responseData.alphabets)},
+  "highest_lowercase_alphabet": ${JSON.stringify(
+    responseData.highest_lowercase_alphabet
+  )}
+}`;
+    }
   };
 
   return (
@@ -55,6 +77,7 @@ function FirstPage() {
             className="form-control"
             value={jsonInput}
             onChange={(e) => setJsonInput(e.target.value)}
+            placeholder="Enter JSON here"
             style={{ borderRadius: "0.25rem" }}
           />
         </div>
@@ -81,7 +104,7 @@ function FirstPage() {
               style={{ width: "100%" }}
               value={selectedOption}
             >
-              <option value="">Select Filter</option>
+              <option value="">Show All</option>
               <option value="alphabets">Alphabets</option>
               <option value="numbers">Numbers</option>
               <option value="highest_lowercase_alphabet">
@@ -91,18 +114,15 @@ function FirstPage() {
 
             <div style={{ marginTop: "20px" }}>
               <h6>Filtered Response</h6>
-              {selectedOption === "alphabets" && (
-                <p>Alphabets: {formatResponse(responseData.alphabets)}</p>
-              )}
-              {selectedOption === "numbers" && (
-                <p>Numbers: {formatResponse(responseData.numbers)}</p>
-              )}
-              {selectedOption === "highest_lowercase_alphabet" && (
-                <p>
-                  Highest Lowercase Alphabet:{" "}
-                  {formatResponse(responseData.highest_lowercase_alphabet)}
-                </p>
-              )}
+              <pre
+                style={{
+                  background: "#f8f9fa",
+                  padding: "15px",
+                  borderRadius: "5px",
+                }}
+              >
+                {formatResponse()}
+              </pre>
             </div>
           </div>
         )}
