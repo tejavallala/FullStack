@@ -3,6 +3,7 @@ import axios from "axios";
 
 function FirstPage() {
   const [jsonInput, setJsonInput] = useState("");
+  const [fileInput, setFileInput] = useState(null);
   const [responseData, setResponseData] = useState(null);
   const [selectedOption, setSelectedOption] = useState("");
   const [error, setError] = useState("");
@@ -10,10 +11,21 @@ function FirstPage() {
   const handleSubmit = async () => {
     try {
       const parsedData = JSON.parse(jsonInput);
+
+      // Prepare form data
+      const formData = new FormData();
+      formData.append("data", JSON.stringify(parsedData));
+      if (fileInput) formData.append("file", fileInput);
+
+      // Make POST request
       const response = await axios.post(
         "https://two1bce7394.onrender.com/bfhl",
-        parsedData
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
       );
+
       setResponseData(response.data);
       setError("");
     } catch (error) {
@@ -29,6 +41,10 @@ function FirstPage() {
     }
   };
 
+  const handleFileChange = (e) => {
+    setFileInput(e.target.files[0]);
+  };
+
   const handleOptionChange = (e) => {
     setSelectedOption(e.target.value);
   };
@@ -38,12 +54,12 @@ function FirstPage() {
 
     switch (selectedOption) {
       case "alphabets":
-        return `"alphabets": ${JSON.stringify(responseData.alphabets)}`;
+        return `"alphabets": ${JSON.stringify(responseData.alphabets || [])}`;
       case "numbers":
-        return `"numbers": ${JSON.stringify(responseData.numbers)}`;
+        return `"numbers": ${JSON.stringify(responseData.numbers || [])}`;
       case "highest_lowercase_alphabet":
         return `"highest_lowercase_alphabet": ${JSON.stringify(
-          responseData.highest_lowercase_alphabet
+          responseData.highest_lowercase_alphabet || []
         )}`;
       default:
         return `{
@@ -51,11 +67,16 @@ function FirstPage() {
   "user_id": "${responseData.user_id}",
   "email": "${responseData.email}",
   "roll_number": "${responseData.roll_number}",
-  "numbers": ${JSON.stringify(responseData.numbers)},
-  "alphabets": ${JSON.stringify(responseData.alphabets)},
+  "numbers": ${JSON.stringify(responseData.numbers || [])},
+  "alphabets": ${JSON.stringify(responseData.alphabets || [])},
   "highest_lowercase_alphabet": ${JSON.stringify(
-    responseData.highest_lowercase_alphabet
-  )}
+    responseData.highest_lowercase_alphabet || []
+  )},
+  "file": {
+    "is_file_valid": ${responseData.file?.is_file_valid || false},
+    "mime_type": "${responseData.file?.mime_type || "N/A"}",
+    "size_kb": "${responseData.file?.size_kb || "N/A"}"
+  }
 }`;
     }
   };
@@ -71,6 +92,8 @@ function FirstPage() {
         }}
       >
         <h6 className="mb-3">API Input</h6>
+
+        {/* JSON Input Field */}
         <div className="mb-3">
           <input
             type="text"
@@ -81,6 +104,18 @@ function FirstPage() {
             style={{ borderRadius: "0.25rem" }}
           />
         </div>
+
+        {/* File Input Field */}
+        <div className="mb-3">
+          <input
+            type="file"
+            className="form-control"
+            onChange={handleFileChange}
+            style={{ borderRadius: "0.25rem" }}
+          />
+        </div>
+
+        {/* Submit Button */}
         <button
           onClick={handleSubmit}
           className="btn btn-primary"
@@ -89,15 +124,19 @@ function FirstPage() {
           Submit
         </button>
 
+        {/* Error Message */}
         {error && (
           <div className="alert alert-danger mt-3" role="alert">
             {error}
           </div>
         )}
 
+        {/* Display API Response */}
         {responseData && (
           <div style={{ marginTop: "20px" }}>
             <h6 className="mb-2">Filter</h6>
+
+            {/* Dropdown to Filter Response */}
             <select
               onChange={handleOptionChange}
               className="form-select"
@@ -112,6 +151,7 @@ function FirstPage() {
               </option>
             </select>
 
+            {/* Filtered Response */}
             <div style={{ marginTop: "20px" }}>
               <h6>Filtered Response</h6>
               <pre
